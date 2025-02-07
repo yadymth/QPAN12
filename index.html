@@ -44,7 +44,7 @@
         .incorrect {
             background: #ff7f7f !important;
         }
-        #next-btn {
+        #next-btn, #restart-btn {
             margin-top: 15px;
             padding: 10px;
             border: none;
@@ -63,15 +63,14 @@
             font-size: 14px;
             color: gray;
         }
-.ig-link {
-    color: red; /* Màu chữ đỏ */
-    font-weight: bold; /* Chữ in đậm (tùy chọn) */
-    text-decoration: none; /* Bỏ gạch chân (tùy chọn) */
-}
-
-.ig-link:hover {
-    text-decoration: underline; /* Khi rê chuột vào sẽ có gạch chân */
-}
+        .ig-link {
+            color: red;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .ig-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -82,13 +81,16 @@
             <p id="question" class="question"></p>
             <ul id="options" class="options"></ul>
             <button id="next-btn">Câu tiếp theo</button>
+            <button id="restart-btn">Làm lại</button>
         </div>
     </div>
 
-    <!-- Bản quyền -->
+    <!-- Bản quyền + Liên hệ -->
     <footer>
-        <p>&copy; 2025 - Được tạo bởi <strong>Lê Trịnh Trà My 12/5 Nguyễn Trãi - Myday</strong>. Mọi quyền được bảo lưu.</p>
-<p>Mọi thắc mắc và góp ý, liên hệ Instagram: <a href="https://www.instagram.com/yadym.th7" target="_blank" class="ig-link">@yadym.th7</a></p>
+        <p>&copy; 2024 - Được tạo bởi <strong>Lê Trịnh Trà My 12/5 Nguyễn Trãi - Myday</strong>. Mọi quyền được bảo lưu.</p>
+        <p>Mọi thắc mắc và góp ý, liên hệ Instagram: 
+            <a href="https://www.instagram.com/yadym.th7" target="_blank" class="ig-link">@yadym.th7</a>
+        </p>
     </footer>
 
     <script>
@@ -121,6 +123,11 @@
         }
 
         function showQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+
             const questionData = questions[currentQuestionIndex];
             document.getElementById("question").textContent = questionData.question;
 
@@ -135,6 +142,7 @@
             });
 
             document.getElementById("next-btn").style.display = "none";
+            document.getElementById("restart-btn").style.display = "none";
             updateProgress();
         }
 
@@ -161,13 +169,30 @@
 
         document.getElementById("next-btn").onclick = () => {
             currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                alert(`Hoàn thành! Bạn trả lời đúng ${correctCount}/${questions.length} câu.`);
-                location.reload(); // Restart game
-            }
+            showQuestion();
         };
+
+        function showResults() {
+            document.getElementById("quiz").innerHTML = `
+                <h3>Hoàn thành!</h3>
+                <p>Bạn trả lời đúng ${correctCount}/${questions.length} câu.</p>
+                <button onclick="restartQuiz()">Làm lại</button>
+            `;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            shuffle(questions);
+            document.getElementById("quiz").innerHTML = `
+                <p id="question" class="question"></p>
+                <ul id="options" class="options"></ul>
+                <button id="next-btn">Câu tiếp theo</button>
+                <button id="restart-btn" style="display:none;" onclick="restartQuiz()">Làm lại</button>
+            `;
+            showQuestion();
+        }
 
         loadQuestions();
     </script>
